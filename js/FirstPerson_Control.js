@@ -74,7 +74,13 @@ var FirstPerson_Control = function ( scale, object, plane, scene, vertex, edge, 
 
             case 76: /*L*/
                 this.lock = 1 - this.lock;
-                console.log( " Control.lock = ", this.lock );
+                if ( this.lock == 1 ) {
+
+                    console.log( " Screen is locked. " );
+                } else {
+
+                    console.log( " Screen is unlocked. " );
+                }
                 break;
 
             case 67: /*C*/ this.clear = 1; break;
@@ -213,7 +219,7 @@ var FirstPerson_Control = function ( scale, object, plane, scene, vertex, edge, 
 
         if ( this.clear == 1 ) {
 
-            console.log( " Start clear selected points. " );
+            console.log( " Clear selected points. " );
 
             for ( var i = 0; i < this.select_sphere.length; i++ ) {
 
@@ -250,10 +256,10 @@ var FirstPerson_Control = function ( scale, object, plane, scene, vertex, edge, 
 
             var intersect = intersects[0];
 
-            var x = intersect.point.x;  // var x = intersect.point.x / this.scale * this.scale / 3 * 2
+            var x = intersect.point.x;
             var y = intersect.point.y;
 
-            console.log( x, y );
+            console.log( " Selected Point: ", x, y );
             this.select_point.push( { x : x, y : y } );
 
             var material = new THREE.MeshLambertMaterial( { color : 0x9A22EF } );
@@ -276,7 +282,7 @@ var FirstPerson_Control = function ( scale, object, plane, scene, vertex, edge, 
 
         }
 
-        if ( this.select_point.length > 1 ) {
+        if ( this.select_point.length >= 2 ) {
 
             var path_arr;
             path_arr = this.spfa(
@@ -296,6 +302,8 @@ var FirstPerson_Control = function ( scale, object, plane, scene, vertex, edge, 
 
         if ( this.reset == 0 ) return;
 
+        console.log( " Reset the view point. " );
+
         this.object.position.set( 0, 0, scale / 4);
         this.object.rotation.set( 0, 0, 0);
         this.reset = 0;
@@ -307,61 +315,61 @@ var FirstPerson_Control = function ( scale, object, plane, scene, vertex, edge, 
         var view = {};
         var dist = {};
         var pa = {};
+        var temp_arr = [];
 
-        var min_dist = 1000000000;
-        var st_index = 0;
+        var inf = 1000000000;
+
+        var min_dist = inf;
         for ( var i = 0; i < this.vertex.length; i++ ) {
 
             var temp = Math.sqrt( (this.vertex[i].x-st.x)*(this.vertex[i].x-st.x) + (this.vertex[i].y-st.y)*(this.vertex[i].y-st.y) );
-            if ( temp < min_dist ) {
+            temp_arr.push( temp );
+            if ( temp < min_dist ) min_dist = temp;
 
-                min_dist = temp;
-                st_index = i;
-
-            }
         }
+
         var way_dist = min_dist;
-        var ed_index = 0;
-        var min_dist = 1000000000;
+        min_dist = min_dist * 1.5;
+        var front = 0;
+        var rear = 0;
+
         for ( var i = 0; i < this.vertex.length; i++ ) {
 
-            var temp = Math.sqrt( (this.vertex[i].x-ed.x)*(this.vertex[i].x-ed.x) + (this.vertex[i].y-ed.y)*(this.vertex[i].y-ed.y) );
-            if ( temp < min_dist ) {
+            if ( temp_arr[i] < min_dist) {
 
-                min_dist = temp;
-                ed_index = i;
+                dist[i] = temp_arr[i];
+                pa[i] = -1;
+                view[i] = rear;
+                q.push( i );
+                rear++;
 
+            }else {
+
+                dist[i] = inf;
+                pa[i] = -2;
+                view[i] = -1;
             }
-            dist[i] = 1000000000;
-            view[i] = -1;
+
         }
 
-        way_dist += min_dist;
-
-
-        q.push( st_index );
-        dist[st_index] = 0;
-        pa[st_index] = -1;
-        var front = 0;
-        var rear = 1;
         while ( front < rear ) {
 
             var p = q[front];
             view[p] = -1;
 
-            for ( var i = 0; i < this.edge[p].length; i++ ) {
+            for (var i = 0; i < this.edge[p].length; i++) {
 
                 var y = this.edge[p][i].y;
                 var w = this.edge[p][i].w;
 
-                if ( dist[y] > dist[p] + w ) {
+                if (dist[y] > dist[p] + w) {
 
                     dist[y] = dist[p] + w;
                     pa[y] = p;
-                    if ( view[y] == -1 ) {
+                    if (view[y] == -1) {
 
                         view[y] = rear;
-                        q.push( y );
+                        q.push(y);
                         rear++;
 
                     }
@@ -369,21 +377,47 @@ var FirstPerson_Control = function ( scale, object, plane, scene, vertex, edge, 
             }
 
             front++;
+        }
+
+        var min_dist = inf;
+        for ( var i = 0; i < this.vertex.length; i++ ) {
+
+            temp_arr[i] = Math.sqrt( (this.vertex[i].x-ed.x)*(this.vertex[i].x-ed.x) + (this.vertex[i].y-ed.y)*(this.vertex[i].y-ed.y) );
+            if ( temp_arr[i] < min_dist ) min_dist = temp_arr[i];
 
         }
 
-        console.log( st_index, ed_index );
+        way_dist += min_dist;
+        min_dist = min_dist * 1.5;
+
+        var ed_index = -1;
+        var sum_dist = inf;
+        for ( var i = 0; i < this.vertex.length; i++ ) {
+
+            if ( temp_arr[i] < min_dist ) {
+                if ( temp_arr[i] + dist[i] < sum_dist ) {
+
+                    sum_dist = temp_arr[i] + dist[i];
+                    ed_index = i;
+                }
+            }
+        }
+
+        /*
+        console.log( ed_index );
         console.log( q );
         console.log( dist );
         console.log( dist[ed_index] );
+        */
 
         var path;
         var path_arr = [];
         var direct_dist = Math.sqrt( (st.x-ed.x)*(st.x-ed.x) + (st.y-ed.y)*(st.y-ed.y) );
-        console.log( direct_dist, way_dist );
 
-        if ( direct_dist <= way_dist ) {
+        console.log( " Driving distance: ", sum_dist, " Direct distance: ", direct_dist );
 
+
+        if ( ed_index == -1 || direct_dist <= way_dist ) {
             path = this.make_path( st, ed );
             path_arr.push( path );
 
@@ -391,18 +425,24 @@ var FirstPerson_Control = function ( scale, object, plane, scene, vertex, edge, 
 
         }
 
-        path = this.make_path( st, this.vertex[st_index] );
-        path_arr.push( path );
+
         path = this.make_path( this.vertex[ed_index], ed );
         path_arr.push( path );
 
         var p = ed_index;
-        while ( p != st_index ) {
+        while ( p >= 0  ) {
 
-            var path = this.make_path( this.vertex[ pa[p] ], this.vertex[p] );
+            if ( pa[p] == -1 || pa[p] == -2 ) {
+
+                var path = this.make_path( st, this.vertex[ p ] );
+            }else {
+
+                var path = this.make_path( this.vertex[ pa[p] ], this.vertex[p] );
+            }
+
             path_arr.push( path );
-
             p = pa[p];
+
         }
 
         return path_arr;
