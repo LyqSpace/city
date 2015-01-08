@@ -46,7 +46,20 @@ var City = function(scale) {
             if ( xhttp.readyState != 4 )
                 return;
 
-            xmlDoc = xhttp.responseXML;
+            var txt = xhttp.response;
+            if ( window.DOMParser ) {
+
+                var parser = new DOMParser();
+                xmlDoc = parser.parseFromString( txt, "text/xml" );
+
+            }else { // IE
+
+                xmlDoc = new ActiveXObject( "Microsoft.XMLDOM" );
+                xmlDoc.async = false;
+                xmlDoc.loadXML( txt);
+
+            }
+
             var bounds = xmlDoc.getElementsByTagName("bounds")[0];
             var minlat = bounds.getAttribute("minlat");
             var minlon = bounds.getAttribute("minlon");

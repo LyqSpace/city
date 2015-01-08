@@ -10,6 +10,8 @@ var FirstPerson_Control = function ( scale, object, plane, scene, vertex, edge, 
     this.domElement = ( domElement !== undefined ) ? domElement : document;
     this.width  = this.domElement.offsetWidth;
     this.height = this.domElement.offsetHeight;
+    this.left = this.domElement.offsetLeft;
+    this.top = this.domElement.offsetTop;
     this.scale = scale;
 
     this.raycaster = new THREE.Raycaster();
@@ -141,13 +143,14 @@ var FirstPerson_Control = function ( scale, object, plane, scene, vertex, edge, 
         event.preventDefault();
         event.stopPropagation();
 
-        this.moveState.z = -event.detail / 120;
+        this.moveState.z = -event.deltaY / 1200;
 
         this.updateMovementVector();
 
         this.moveState.z = 0;
 
     };
+
     this.DOMMouseScroll = function (event) {
 
         if ( this.mouseStatus == 1 ) return;
@@ -232,10 +235,8 @@ var FirstPerson_Control = function ( scale, object, plane, scene, vertex, edge, 
         if ( this.lock == 0 ) return;
 
         var vector = new THREE.Vector3();
-        var left = Math.floor( ( window.innerWidth - this.width ) / 2 ) - 6;
-        var top = Math.floor( ( window.innerHeight - this.height ) / 2 ) - 6;
-        var x = ( clientX - left ) / this.width * 2 - 1;
-        var y = -( clientY - top ) / this.height * 2 + 1;
+        var x = ( clientX - this.left ) / this.width * 2 - 1;
+        var y = -( clientY - this.top ) / this.height * 2 + 1;
 
         //console.log( left, top, clientX, clientY, this.width, this.height);
 
