@@ -1,5 +1,6 @@
 /**
- * @author James Baicoianu / http://www.baicoianu.com/
+ * All rights reserved. Email: root#lyq.me
+ * 2014-1-9
  */
 
 var FirstPerson_Control = function ( scale, object, plane, scene, vertex, edge, domElement ) {

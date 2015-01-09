@@ -1,5 +1,6 @@
 /**
- * Created by lyq on 12/24/14.
+ * All rights reserved. Email: root#lyq.me
+ * 2014-1-9
  */
 
 var City = function(scale) {
