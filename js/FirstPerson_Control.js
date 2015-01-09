@@ -149,7 +149,7 @@ var FirstPerson_Control = function ( scale, object, plane, scene, vertex, edge, 
         event.preventDefault();
         event.stopPropagation();
 
-        this.moveState.z = -event.deltaY / 1200;
+        this.moveState.z = event.deltaY / 1200;
 
         this.updateMovementVector();
 
