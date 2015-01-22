@@ -347,7 +347,7 @@ var City = function(scale) {
 
             var name = ObjectText( text, 0x0000ff );
             name.scale.set( 18, 18, 0.2);
-            name.position.set( mid_point[0], mid_point[1], height+0.2 );
+            name.position.set( mid_point[0], mid_point[1], height+0.1 );
             object.names.push( name );
         }
 
@@ -457,7 +457,7 @@ var City = function(scale) {
 
             var name = ObjectText( text, 0x0000ff );
             name.scale.set( 8, 8, 0.2);
-            name.position.set( mid_point[0], mid_point[1], height+0.2);
+            name.position.set( mid_point[0], mid_point[1], height+0.1);
             object.names.push( name );
 
         }

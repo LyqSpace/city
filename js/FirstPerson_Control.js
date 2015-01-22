@@ -150,7 +150,7 @@ var FirstPerson_Control = function ( scale, object, plane, scene, vertex, edge, 
         event.preventDefault();
         event.stopPropagation();
 
-        this.moveState.z = event.deltaY / 1200;
+        this.moveState.z = event.deltaY / 1200 * this.speedMultiplier;
 
         this.updateMovementVector();
 
@@ -169,7 +169,7 @@ var FirstPerson_Control = function ( scale, object, plane, scene, vertex, edge, 
         event.preventDefault();
         event.stopPropagation();
 
-        this.moveState.z = event.detail / 27;
+        this.moveState.z = event.detail / 27 * this.speedMultiplier;
 
         this.updateMovementVector();
 
@@ -198,6 +198,12 @@ var FirstPerson_Control = function ( scale, object, plane, scene, vertex, edge, 
         this.object.rotation.setFromQuaternion( this.object.quaternion, this.object.rotation.order );
 
 
+    };
+
+    this.updateFly = function() {
+
+        if ( this.flyPath.length == 0 ) return;
+        
     };
 
     this.updateMovementVector = function() {
